@@ -16,9 +16,9 @@ npx skills add kouhe3/skills
 
 | Skill | 做什么 | 什么时候用 |
 | --- | --- | --- |
-| `helping` | Schein 式帮助：先问后答，一轮一个动作；`references/review.md` 是复盘 rubric。 | 用户求助、卡住、或你准备给未被请求的建议时。 |
+| `helping` | Schein 式帮助：先问后答，一轮一个动作；`references/review.md` 是复盘 rubric。 | 用户卡住、情绪上来、求助，或你准备给未被请求的建议时；想法本身要审则用 `talk-audit`。 |
 | `face-spaghetti` | 屎山代码的开工闸门：先判能否开工，再按 claim → probe → 台账 建二值判据；`references/` 与 `scripts/` 是取证库。 | 遗留代码、反编译产物、无文档 SDK，或写不出验收标准时。 |
-| `talk-audit` | 把想法拆成 claim，选操作、要证据、标 status；默认 talk 页，不判决；`references/class-trial.md` 是可选判决模式。 | 用户明确要压力测试一个想法/方案/判断、找隐藏假设、或反对奉承式“好主意”时。 |
+| `talk-audit` | 把想法拆成 claim，选操作、要证据、标 status；默认 talk 页，不判决；`references/class-trial.md` 是可选判决模式。 | 用户拿来一个方案/判断，要压力测试、挖隐藏假设、或拆掉奉承式“好主意”时；情绪与关系用 `helping`。 |
 
 ## 结构
 

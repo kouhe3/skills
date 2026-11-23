@@ -1,7 +1,7 @@
 ---
 name: talk-audit
 license: MIT
-description: claim 审计：把想法/方案/判断拆成一组 claim，选操作、要证据、标 status。用于压力测试一个方案、挖隐藏假设、或拆掉奉承式“好主意”。
+description: claim 审计：用户拿来一个方案/判断，要压力测试、挖隐藏假设、或拆掉奉承式“好主意”时用。审的是 claim 和证据；情绪、卡住、关系用 helping。
 ---
 
 # Talk Audit
