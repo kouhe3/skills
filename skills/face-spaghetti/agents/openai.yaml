@@ -1,0 +1,3 @@
+interface:
+  display_name: "Face Spaghetti"
+  short_description: "Entry point for spaghetti code: probe facts before spec or tickets"

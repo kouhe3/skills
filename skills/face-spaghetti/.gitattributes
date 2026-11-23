@@ -1,0 +1,2 @@
+# 文本一律 LF：blob 与工作树同形，Windows 编辑器写回 CRLF 时 diff 仍按 LF 归一，不产生整文件改动。
+* text=auto eol=lf
