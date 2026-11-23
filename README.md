@@ -54,4 +54,4 @@ tools/validate_skills.py
 
 ## License
 
-尚未选择 License；发布前加 `LICENSE`。
+MIT. See [`LICENSE`](LICENSE).

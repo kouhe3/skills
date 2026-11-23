@@ -1,5 +1,6 @@
 ---
 name: talk-audit
+license: MIT
 description: 把想法拆成 claim，选操作、要证据、标 status；默认 talk 页，判决按需。用户明确要压力测试一个想法/方案/判断、找隐藏假设、或反对奉承式“好主意”时使用。
 ---
 

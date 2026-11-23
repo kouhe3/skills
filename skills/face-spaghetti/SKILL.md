@@ -1,5 +1,6 @@
 ---
 name: face-spaghetti
+license: MIT
 description: Spaghetti 代码库（遗留、无文档/无测试、反编译产物、无文档 SDK）的开工闸门与入口——先判能否开工（可测性门 / 停止条件），再按 claim→probe→台账 循环建二值判据；装了 mattpocock skills 时，屎山任务从这里入口，grilling 不补事实；写不出验收标准或只能靠踩坑推进时也用。
 ---
 
