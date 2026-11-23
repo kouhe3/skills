@@ -1,10 +1,10 @@
 # kouhe3/skills
 
+仓库：https://github.com/kouhe3/skills
+
 三个 Agent Skill：**更好地帮助**（`helping`）、**面临屎山**（`face-spaghetti`）、**talk-audit**。
 
 ## 安装
-
-推送到 GitHub 后：
 
 ```bash
 npx skills add kouhe3/skills
@@ -23,6 +23,8 @@ npx skills add kouhe3/skills
 ## 结构
 
 ```
+README.md
+LICENSE
 skills/
   helping/
     SKILL.md
@@ -44,7 +46,7 @@ tools/validate_skills.py
 ## 规范
 
 - Agent Skills specification: https://agentskills.io/specification
-- Directory: https://skills.sh
+- 安装器/目录：https://skills.sh
 - 校验：`python tools/validate_skills.py`
 - 三个 skill 的 `name` 与目录名一致，`description` ≤ 1024 字符，正文 < 500 行；引用文件都在 `references/`、`scripts/` 或 `assets/` 下。
 
