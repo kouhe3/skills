@@ -50,7 +50,7 @@ tools/validate_skills.py
 
 ## 调用
 
-三个 skill 都是 model-invoked：description 负责发现，名字也可以手动调用。`talk-audit` 如果要严格手动-only，在本地 frontmatter 加 `disable-model-invocation: true`（这是 omp 扩展，不在 Agent Skills 规范里）。
+三个 skill 都是 model-invoked：description 负责发现，名字也可以手动调用。`talk-audit` 如果要严格手动-only，在本地 frontmatter 加 `disable-model-invocation: true`（这是 Claude Code 引入、omp 也支持的扩展字段，不在 Agent Skills 规范里）。
 
 ## License
 
