@@ -23,6 +23,12 @@
 npx skills add kouhe3/skills
 ```
 
+## 依赖
+
+本仓库自己写 skill 时依赖 [`mattpocock/skills@writing-for-agents`](https://skills.sh/mattpocock/skills/writing-for-agents)（MIT）：怎么给 agent 写文档——上下文指针的措辞、信息层级放多深、完成判据、leading words 与修剪。
+
+它装在 `.agents/skills/writing-for-agents/`，与上游逐字节一致（不改，`npx skills update` 才不会撞哈希），版本锁在 `skills-lock.json`；不在 `skills/` 下，因为 `skills/` 只放本仓库产出的 skill。
+
 ## 规范检查
 
 - Agent Skills specification: https://agentskills.io/specification

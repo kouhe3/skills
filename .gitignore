@@ -1,0 +1,2 @@
+# npx skills 会给每个检测到的 agent 复制一份依赖；只保留 .agents/skills 这一份
+.claude/
