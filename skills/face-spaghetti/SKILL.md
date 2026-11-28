@@ -1,7 +1,7 @@
 ---
 name: face-spaghetti
 license: MIT
-description: Spaghetti 代码库（遗留、无文档/无测试、反编译产物、无文档 SDK）的开工闸门与入口——先判能否开工（可测性门 / 停止条件），再按 claim→probe→台账 循环建二值判据；装了 mattpocock skills 时，屎山任务从这里入口，grilling 不补事实；写不出验收标准或只能靠踩坑推进时也用。
+description: Spaghetti 代码库（遗留、无文档/无测试、反编译产物、无文档 SDK）的开工闸门与入口——先判能否开工（可测性门 / 停止条件），再按 claim→probe→台账 循环建二值判据；装了 mattpocock skills 时，屎山任务从这里入口，grilling 不补事实；二值判据写不出或只能靠踩坑推进时也用。
 ---
 
 # Face Spaghetti
@@ -14,7 +14,7 @@ description: Spaghetti 代码库（遗留、无文档/无测试、反编译产�
 
 **可移植**：本 skill 只写相对约定与判据；项目落点与本机事实写目标仓库的 `docs/agents/face-spaghetti.md`（§9 的 setup 生成）。同族配置（issue tracker / triage 标签 / 领域文档）也在 `docs/agents/`，由 `/setup-matt-pocock-skills` 写。
 
-**入口**：命中本 skill 触发词时（反编译产物 / 遗留二进制 / 无文档 SDK / 只能靠踩坑推进），入口是本 skill，不是 `mattpocock/skills` 的主流程（`grill-with-docs` → `to-spec` → `to-tickets` → `implement`）。依赖上本 skill 也在前段：那套流程假设用户能回答、代码可读、模块边界已知；屎山把这三个前提都打破。那套 skill 的三种取证方式里，`/prototype`（先做后定）与 `/research`（一手资料）可以在循环内用；`/grilling` 只取用户拥有的决定。屎山缺的是事实，不是决定；把事实缺口丢进 grilling，只会问出用户和文档都没记载的事。
+**入口**：屎山任务从本 skill 入口，不走 `mattpocock/skills` 的主流程（`grill-with-docs` → `to-spec` → `to-tickets` → `implement`）：那套流程假设用户能回答、代码可读、模块边界已知；屎山把这三个前提都打破。那套 skill 的三种取证方式里，`/prototype`（先做后定）与 `/research`（一手资料）可以在循环内用；`/grilling` 只取用户拥有的决定。屎山缺的是事实，不是决定；把事实缺口丢进 grilling，只会问出用户和文档都没记载的事。
 
 | 问题 | 谁答 | 动作 |
 |---|---|---|
@@ -52,7 +52,7 @@ description: Spaghetti 代码库（遗留、无文档/无测试、反编译产�
 | A 的合同是转发 B 的调用 / 返回值 | 走 **Wrapper 例外**：判调用环，B 的内容单列 `UNMEASURED`（`references/claims.md`） |
 | 来源不可信 / 二值判据写不出 / 机制断言未证 / 靠踩坑推进 | 过下面的闸门 |
 
-`来源不可信` 包括反编译产物、遗留二进制、无文档 SDK、只能靠观察行为的第三方实现。
+`来源不可信` 的判据：没有行为规范可照断言，只能从实现或行为反推。
 
 **判据来源三分**：开工前先答「我拿什么当判据」，再选三态。三种对象的做法不同，混用会得出「全绿但没有价值」。
 
@@ -348,16 +348,7 @@ claim 与 plan 任务的术语用 `docs/agents/domain.md` 指向的 glossary 定
 | 领域文档（glossary / ADR 消费规则） | `docs/agents/domain.md` | 软：缺了静默继续 | 同上 |
 | 本 skill 落点 | `docs/agents/face-spaghetti.md` | **硬**：缺了先跑 setup；用户拒绝时用默认落点并在 plan 记 `config=default` | 本 skill（`references/setup.md`） |
 
-**四本账，各写各的**：
-
-| 账 | 记什么 | 落点 | 谁写 |
-|---|---|---|---|
-| 事实账 | 二值 claim、等级、出处、状态 | `docs/facts.md`（§8） | 本 skill |
-| 定义域 | `measured` / `unmeasured` 判据覆盖 | `docs/coverage-domain.md` | 本 skill（`references/coverage-domain.md`） |
-| 领域语言 | glossary 术语、ADR 取舍 | `GLOSSARY.md`、`docs/adr/` | `/domain-modeling`，只收 `已证` |
-| 工作队列 | backlog、tickets、triage 标签 | `docs/agents/issue-tracker.md` 指定处 | `/triage`、`/to-tickets` |
-
-fact 是唯一事实源：glossary 只收 `已证` 术语（或纯命名决定），ticket / spec 只引用 fact id。逐 skill 的接入位置、三种取证模式（探针 / 原型、研究、访谈）与两个方向的交接见 `references/pairing.md`。
+**四本账，各写各的**：账本清单、落点、作者与逐 skill 的接入位置（三种取证模式、两方向交接）见 `references/pairing.md`。fact 是唯一事实源：glossary 只收 `已证` 术语（或纯命名决定），ticket / spec 只引用 fact id。
 
 **指令文件里只有指针**：两套 setup 共用 `CLAUDE.md`（其次 `AGENTS.md`）里的 `## Agent skills` 块；本 skill 在里面加 `### Face Spaghetti`，一行指到 `docs/agents/face-spaghetti.md`。块不存在时不替对方创建，文末追加一行独立指针。
 
@@ -367,10 +358,3 @@ fact 是唯一事实源：glossary 只收 `已证` 术语（或纯命名决定�
 
 **领域文档（软依赖）**：改机制前读该区域的 ADR，claim / plan 的术语用 `docs/agents/domain.md` 指向的 glossary（单上下文即根 `GLOSSARY.md`）定义；与 ADR 冲突时显式写出冲突，不静默覆盖。文件不存在就静默继续，不提议先补文档。术语进 glossary 前必须 `已证`（或它是纯命名决定）；`待证` 猜测不进 glossary / ADR。
 
-**计划目录是仓库约定**：`tasks/plan.md` + `tasks/todo.md`（agent-skills 家族的约定）、`docs/plans/` 都算，本 skill 不另立一套；校验脚本用 `FACTS_FILE` / `PLAN_GLOBS` 指向该仓库的实际路径。
-
-**测试宿主必须有发行 / 测试两条路径**：测试构建默认私有桌面 + 控制通道是常态；产物要给人双击时，用配置宏把「无参数启动」切成交互桌面 + 无控制通道，测试仍走显式开关。两条路径各一条 smoke，别让测试壳冒充发行版（instruments §0.9）。
-
-**共享资源写进项目约定**：存档/音频端点/系统设置的**隔离方式**写进 `docs/agents/face-spaghetti.md`；每轮探测的**恢复命令**进台账（§2.2）。
-
-**冻结与交接**：换目标前先跑门禁并把结果收进冻结树，再整树搬迁、在新位置重建并原地复跑同一门禁；冻结树只读，活动台账续号。步骤与完成判据见 `references/handoff.md`。
