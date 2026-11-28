@@ -338,6 +338,25 @@
 - 长 cell 表加 `--only <cell>`：单 cell 跑少量进程，避免整表重跑。
 - 下游 live 路径仍有差异时，cell 只锁 wrapper：签名取 `ret + 转发环 + trace[:1]`，下游单列 `UNMEASURED` + backlog（见 Wrapper 例外）。
 
+## 0.13 外部 oracle 的适配清单（同一份代码，两种调用者）
+
+被测对象只能通过自己的 TU、自己的生成代码、自己的常量表访问时，探针与真实调用者之间的差异会伪装成「实现差异」。逐条先查：
+
+| 症状 | 机制 | 处置 |
+|---|---|---|
+| 私有类 / 匿名命名空间里的类拿不到 | 符号只在那个 `.cpp` 的 TU 内可见 | 探针 `#include "<被测>.cpp"`，链接加 `-Wl,--allow-multiple-definition`（与已构建静态库里的同名符号共存）；构建命令写进探针文件头 |
+| 随机分支每次采样都一样 | 函数内 `static`（如 `get_default()` 的 op 树）一个进程只构造一次 | **每样本一个新进程**；同进程跑 N 次只证明确定性，不证明分布。要覆盖随机分支集合，样本数 × 分支数一起算 |
+| vector 元素读不对 / 报 `Wrong vector length` | 生成器有两套：`TlFetchBoxed<...>`（带 `0x1cb5c415`）与 `TlFetchVector<...>`（**裸 count、裸元素**） | 构造语料前先读生成代码的 `X::X(TlParser&)`，按它写，不要按 TL 规范猜 |
+| 指纹 / 摘要差几个字节 | 具体类的 `tl_store_unsafe` **只写字段**，构造号在 boxed 外层 | 复刻序列化时先确认「这个 API 写不写 ctor」；差 4 字节 = 多写或漏写构造号 |
+| 库自己的 key 表能加载，我造的另一种 PEM 头却行为不同 | 同一入口（如 `PEM_read_bio_PUBKEY`）接受多种头（SPKI / PKCS#1），真实调用点只用其中一种 | 语料从**真实调用点的常量**（源码里的字符串字面量）取，不按格式规范造 |
+| 文案里的列表格式对不上 | 容器的 `operator<<` 是 `{a, b}` 不是 `[a, b]`，空表是 `{}` | 打印格式先实测一次，再写进另一侧；不要按语言习惯猜 |
+| 两侧行内容相同、整串不等 | C++ `printf` 在 Windows 输出 `\r\n`，Rust/Python 写 `\n` | 比较前统一 `replace("\r\n", "\n")`；与台账文件行尾那类问题不同源，不要混用处置 |
+| 含非 ASCII 的 argv 两侧不同 | C++ `main` 的 argv 是 ANSI 代码页，Rust 是 UTF-8 | 参数走 hex / base64；或两侧都用 `CommandLineToArgvW` + `CP_UTF8` |
+| 长输入构造不出来 | Windows 命令行上限 32767 字符 | 探针支持 `-` 从 stdin 读 hex；长边界（如 35000 字节）只走这条路 |
+| 同一脚本文本两侧输出不同字节 | 参数进制不一致（C++ `tokens >> unsigned int` 是十进制，另一侧误用十六进制解析） | 脚本格式写进探针文件头，两侧按同一进制解析 |
+
+前五条会**静默**给出错误语料（不报错、只是内容不对），后五条会给出**假分歧**。两类都要在第一条 DIFF 出现时先过一遍这张表，再怀疑被测实现。
+
 ## 1. 自证清单
 
 仪器自己错时报出的"目标缺陷"是它自己的缺陷，而且**不报错、只给结论**。所以自证写进流程，不靠运气。
@@ -391,6 +410,9 @@
 | I45 | **被测试替身吞掉的调用：判据取实参，不取副作用** | 替身（记录参数、返回成功但不执行）会让被测系统的结果永远停在旧值：oracle 的 `MoveWindow` 是替身，resize 后状态 rect 不变，只能比参数；host 侧真执行同一公式，状态才跟随。做法：① 判据 = 替身环参数（x/y/w/h/repaint）逐条相等；② 另一侧真执行并断言结果跟随，作为「参数有效」的对照；③ 台账写明「该 API 在 oracle 侧是替身」 | 比 resize 后的 rect（替身冻结，永远相等或永远不等）；把替身吞掉的副作用当产品差异；漏写替身边界，后来者以为测了真实窗口行为 |
 | I46 | **单侧劫持不是对称替换** | live-object hijack（对象指针 / 子对象槽）只截获**经过该指针**的调用；S 若直接调用自己的 dispatcher，劫持对它无效。做法：① 先证两侧都命中（各自 dispatch ring 计数 > 0、首条 entry 存在）；② 行为 lane 用 record-and-forward（记录后调用原函数），router-only lane 用**两侧同源**的 canned 返回；③ 不要把 oracle 的单侧回调当 A/B 判据 | 把单侧劫持当两侧桩，S 的真实下游继续跑（或按默认返回走进无界路径）；路由器差异被下游崩溃 / 挂起掩盖 |
 | I47 | **消息用例 ≠ 分支 cell** | WndProc 消息表的 lane 会命中提前门（某个全局 / 对象字段为 0）而根本没执行 dispatch 分支；转发 / 常量分支（`ShowCursor`、`DefWindowProc`、默认绘制、`WM_CLOSE`）没有可观测差异，坏实现与真实现无法区分。做法：按「消息 × 门控前置 × 入口」枚举 cell；转发 / 旁路 cell 加 spy（ShowCursor / DefWindowProc / PostMessage / EnableMenuItem 环）与必 FAIL 负例；否则只算 control-flow coverage，记 `unmeasured` | 用「若干条消息 ret/graph/post 全等」宣布消息表等价；mousemove / killfocus 落在提前门上，目标 op 从未执行 |
+
+| I48 | **abort 类判据在 Windows 上要先压 WER** | 「这行会不会 abort」只能每例一进程比「有没有返回」时，`abort()` 走 fast-fail → WerFault，每次等待约 3.7 s；17 例 × 2 侧就能把一条 lane 拖到 100 s+，看起来像卡死。做法：父进程（仪器）先 `SetErrorMode(SEM_FAILCRITICALERRORS\|SEM_NOGPFAULTERRORBOX\|SEM_NOOPENFILEERRORBOX)` 再生子进程，单次 abort 降到约 0.1 s；判据仍是「子进程非零退出」，不比对 abort 文案（两侧运行时不同） | 把 abort 延迟当成被测物挂起；为省时间删掉 abort 例；改比 stderr 的 CHECK 文案 |
+| I49 | **纯函数 lane 的第三重校验：独立公式反算 oracle** | C++ oracle 对 Rust 的两侧相等只证明「两边一样」，不证明 oracle 真在跑文档写的那条算法（探针把输入喂错、调错重载都会让两侧一起错）。做法：仪器里用一段独立的最小实现（Python 十几行：符号扩展 + 掩码、哈希累加、base64 分组）按文档重算每个 case，与 oracle 输出逐条比对；不一致先修探针。附带判据：空输入、边界值单独断言 | 只比两侧就宣布「算法已复刻」；独立实现照抄探针的结构（等于同一份错）；把反算写进产品代码路径 |
 
 **放弃条件**：当一台仪器的准备成本超过它要回答的问题时，**换尺度**，不要换更硬的仪器。为拿一个定时器参数上调试器、被无关模块的加载事件反复打断，不如用「屏幕小块按固定间隔采样、统计画面变化率」——三行代码就能回答"渲染是按需重绘还是固定 tick"。
 
